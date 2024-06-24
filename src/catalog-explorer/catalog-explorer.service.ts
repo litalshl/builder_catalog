@@ -6,7 +6,7 @@ import { lastValueFrom } from 'rxjs';
 
 @Injectable()
 export class CatalogExplorerService {
-  private apiUrl = 'http://localhost:3000/api';
+  private apiUrl = 'https://d16m5wbro86fg2.cloudfront.net/api';
 
   constructor(private readonly httpService: HttpService) {}
 
