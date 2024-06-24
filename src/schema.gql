@@ -1,0 +1,17 @@
+type Brick {
+  id: String!
+  name: String!
+  width: Int!
+  length: Int!
+  colorId: String!
+}
+
+type Set {
+  id: String!
+  name: String!
+  bricks: [Brick!]!
+}
+
+type Query {
+  getBuildableSets(username: String!): [Set!]!
+}
