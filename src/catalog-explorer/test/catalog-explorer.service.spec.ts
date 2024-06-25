@@ -1,155 +1,72 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { HttpService } from '@nestjs/axios';
 import { CatalogExplorerService } from '../catalog-explorer.service';
-import { of } from 'rxjs';
-import { AxiosResponse } from 'axios';
+import fetch from 'node-fetch';
+import { mockFullSet1, mockFullSet2, mockUser1, mockUser2 } from './mocks/mock-data';
+
+jest.mock('node-fetch');
+const { Response } = jest.requireActual('node-fetch');
 
 describe('CatalogExplorerService', () => {
   let service: CatalogExplorerService;
-  let httpService: HttpService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [
-        CatalogExplorerService,
-        {
-          provide: HttpService,
-          useValue: {
-            get: jest.fn(),
-          },
-        },
-      ],
+      providers: [CatalogExplorerService],
     }).compile();
 
     service = module.get<CatalogExplorerService>(CatalogExplorerService);
-    httpService = module.get<HttpService>(HttpService);
   });
 
   it('should be defined', () => {
     expect(service).toBeDefined();
   });
 
+  it('should transform user collection correctly', () => {
+    const transformed = service['transformUserInventory'](mockUser1.collection);
+    expect(transformed).toEqual({
+      '11211_155': 9,
+      '11211_9': 4,
+      '11211_5': 20,
+      '36840_2': 15,
+      '36840_155': 7,
+      '36840_5': 15,
+      '3023_2': 15,
+      '3023_4': 11,
+      '3023_5': 15,
+      '3004_2': 15,
+      '3004_155': 7,
+      '3004_5': 15,
+    });
+  });
+
+  it('should transform set pieces correctly', () => {
+    const transformed = service['transformSetInventory'](mockFullSet1.pieces);
+    expect(transformed).toEqual({
+      '11211_5': 18,
+      '36840_5': 10,
+    });
+  });
+
   describe('getBuildableSets', () => {
     it('should return buildable sets for the user', async () => {
-      const mockUser = {
-        id: '1',
-        name: 'John Doe',
-        inventory: [
-          { count: 10, brick: { id: 'brick1', colorId: 'color1' } },
-          { count: 5, brick: { id: 'brick2', colorId: 'color2' } },
-        ],
-      };
+      (fetch as jest.MockedFunction<typeof fetch>)
+        .mockResolvedValueOnce(new Response(JSON.stringify(mockUser1)))
+        .mockResolvedValueOnce(new Response(JSON.stringify([mockFullSet1, mockFullSet2])))
+        .mockResolvedValueOnce(new Response(JSON.stringify(mockFullSet1)))
+        .mockResolvedValueOnce(new Response(JSON.stringify(mockFullSet2)));
 
-      const mockSets = [
-        { id: 'set1', name: 'Set 1' },
-        { id: 'set2', name: 'Set 2' },
-      ];
-
-      const mockFullSet1 = {
-        id: 'set1',
-        name: 'Set 1',
-        bricks: [
-          { count: 5, brick: { id: 'brick1', colorId: 'color1' } },
-          { count: 5, brick: { id: 'brick2', colorId: 'color2' } },
-        ],
-      };
-
-      const mockFullSet2 = {
-        id: 'set2',
-        name: 'Set 2',
-        bricks: [
-          { count: 10, brick: { id: 'brick1', colorId: 'color1' } },
-          { count: 5, brick: { id: 'brick2', colorId: 'color2' } },
-        ],
-      };
-
-      const mockAxiosResponse = <T>(data: T): AxiosResponse<T> => ({
-        data,
-        status: 200,
-        statusText: 'OK',
-        headers: {},
-        config: {
-          headers: undefined
-        },
-      });
-
-      jest.spyOn(httpService, 'get').mockImplementation((url: string) => {
-        switch (url) {
-          case 'http://localhost:3000/api/user/by-username/johndoe':
-            return of(mockAxiosResponse(mockUser));
-          case 'http://localhost:3000/api/sets':
-            return of(mockAxiosResponse(mockSets));
-          case 'http://localhost:3000/api/set/by-id/set1':
-            return of(mockAxiosResponse(mockFullSet1));
-          case 'http://localhost:3000/api/set/by-id/set2':
-            return of(mockAxiosResponse(mockFullSet2));
-          default:
-            return of(mockAxiosResponse(null));
-        }
-      });
-
-      const result = await service.getBuildableSets('johndoe');
+      const result = await service.getBuildableSets('brickfan35');
       expect(result).toEqual([mockFullSet1, mockFullSet2]);
     });
 
     it('should return an empty array if no sets can be built', async () => {
-      const mockUser = {
-        id: '1',
-        name: 'John Doe',
-        inventory: [
-          { count: 1, brick: { id: 'brick1', colorId: 'color1' } },
-        ],
-      };
+      (fetch as jest.MockedFunction<typeof fetch>)
+        .mockResolvedValueOnce(new Response(JSON.stringify(mockUser2)))
+        .mockResolvedValueOnce(new Response(JSON.stringify([mockFullSet1, mockFullSet2])))
+        .mockResolvedValueOnce(new Response(JSON.stringify(mockFullSet1)))
+        .mockResolvedValueOnce(new Response(JSON.stringify(mockFullSet2)));
 
-      const mockSets = [
-        { id: 'set1', name: 'Set 1' },
-        { id: 'set2', name: 'Set 2' },
-      ];
-
-      const mockFullSet1 = {
-        id: 'set1',
-        name: 'Set 1',
-        bricks: [
-          { count: 5, brick: { id: 'brick1', colorId: 'color1' } },
-          { count: 5, brick: { id: 'brick2', colorId: 'color2' } },
-        ],
-      };
-
-      const mockFullSet2 = {
-        id: 'set2',
-        name: 'Set 2',
-        bricks: [
-          { count: 10, brick: { id: 'brick1', colorId: 'color1' } },
-          { count: 5, brick: { id: 'brick2', colorId: 'color2' } },
-        ],
-      };
-
-      const mockAxiosResponse = <T>(data: T): AxiosResponse<T> => ({
-        data,
-        status: 200,
-        statusText: 'OK',
-        headers: {},
-        config: {
-          headers: undefined
-        },
-      });
-
-      jest.spyOn(httpService, 'get').mockImplementation((url: string) => {
-        switch (url) {
-          case 'http://localhost:3000/api/user/by-username/johndoe':
-            return of(mockAxiosResponse(mockUser));
-          case 'http://localhost:3000/api/sets':
-            return of(mockAxiosResponse(mockSets));
-          case 'http://localhost:3000/api/set/by-id/set1':
-            return of(mockAxiosResponse(mockFullSet1));
-          case 'http://localhost:3000/api/set/by-id/set2':
-            return of(mockAxiosResponse(mockFullSet2));
-          default:
-            return of(mockAxiosResponse(null));
-        }
-      });
-
-      const result = await service.getBuildableSets('johndoe');
+      const result = await service.getBuildableSets('brickfan22');
       expect(result).toEqual([]);
     });
   });
