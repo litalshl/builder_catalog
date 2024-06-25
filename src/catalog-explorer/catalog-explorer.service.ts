@@ -99,7 +99,8 @@ export class CatalogExplorerService {
 
       for (const set of sets) {
         const fullSet = await this.getSetById(set.id);
-        if (this.canBuildSet(fullSet, userInventory)) {
+        const setInventory = this.transformSetInventory(fullSet.pieces);
+        if (this.canBuildSet(setInventory, userInventory)) {
           buildableSets.push(fullSet);
         }
       }
@@ -132,8 +133,8 @@ export class CatalogExplorerService {
     return transformed;
   }
 
-  private canBuildSet(set: FullSet, userInventory): boolean {
-    const setInventory = this.transformSetInventory(set.pieces);
+  private canBuildSet(setInventory, userInventory): boolean {
+    
     for (const key in setInventory) {
       if (!userInventory[key] || userInventory[key] < setInventory[key]) {
         return false;
