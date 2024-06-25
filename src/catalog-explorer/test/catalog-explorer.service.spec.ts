@@ -22,7 +22,7 @@ describe('CatalogExplorerService', () => {
   });
 
   it('should transform user collection correctly', () => {
-    const transformed = service['transformUserInventory'](mockUser1.collection);
+    const transformed = service['defineUserInventory'](mockUser1.collection);
     expect(transformed).toEqual({
       '11211_155': 9,
       '11211_9': 4,
@@ -40,7 +40,7 @@ describe('CatalogExplorerService', () => {
   });
 
   it('should transform set pieces correctly', () => {
-    const transformed = service['transformSetInventory'](mockFullSet1.pieces);
+    const transformed = service['defineSetInventory'](mockFullSet1.pieces);
     expect(transformed).toEqual({
       '11211_5': 18,
       '36840_5': 10,
