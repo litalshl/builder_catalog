@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { CatalogExplorerService } from '../catalog-explorer.service';
 import fetch from 'node-fetch';
-import { mockFullSet1, mockFullSet2, mockUser1, mockUser2 } from './mocks/mock-data';
+import { mockFullSet1, mockFullSet2, mockSets, mockUser1, mockUser2 } from './mock-data';
 
 jest.mock('node-fetch');
 const { Response } = jest.requireActual('node-fetch');
@@ -51,7 +51,8 @@ describe('CatalogExplorerService', () => {
     it('should return buildable sets for the user', async () => {
       (fetch as jest.MockedFunction<typeof fetch>)
         .mockResolvedValueOnce(new Response(JSON.stringify(mockUser1)))
-        .mockResolvedValueOnce(new Response(JSON.stringify([mockFullSet1, mockFullSet2])))
+        .mockResolvedValueOnce(new Response(JSON.stringify(mockUser1)))
+        .mockResolvedValueOnce(new Response(JSON.stringify(mockSets)))
         .mockResolvedValueOnce(new Response(JSON.stringify(mockFullSet1)))
         .mockResolvedValueOnce(new Response(JSON.stringify(mockFullSet2)));
 
@@ -62,7 +63,8 @@ describe('CatalogExplorerService', () => {
     it('should return an empty array if no sets can be built', async () => {
       (fetch as jest.MockedFunction<typeof fetch>)
         .mockResolvedValueOnce(new Response(JSON.stringify(mockUser2)))
-        .mockResolvedValueOnce(new Response(JSON.stringify([mockFullSet1, mockFullSet2])))
+        .mockResolvedValueOnce(new Response(JSON.stringify(mockUser2)))
+        .mockResolvedValueOnce(new Response(JSON.stringify(mockSets)))
         .mockResolvedValueOnce(new Response(JSON.stringify(mockFullSet1)))
         .mockResolvedValueOnce(new Response(JSON.stringify(mockFullSet2)));
 
