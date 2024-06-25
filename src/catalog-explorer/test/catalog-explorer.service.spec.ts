@@ -1,30 +1,20 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { HttpService } from '@nestjs/axios';
 import { CatalogExplorerService } from '../catalog-explorer.service';
-import { mockFullSet1, mockFullSet2, mockUser1, mockUser2 } from './mocks/mock-data'
-import { setupHttpServiceMock } from './mocks/mock-http-service';
+import fetch from 'node-fetch';
+import { mockFullSet1, mockFullSet2, mockUser1, mockUser2 } from './mocks/mock-data';
+
+jest.mock('node-fetch');
+const { Response } = jest.requireActual('node-fetch');
 
 describe('CatalogExplorerService', () => {
   let service: CatalogExplorerService;
-  let httpService: HttpService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [
-        CatalogExplorerService,
-        {
-          provide: HttpService,
-          useValue: {
-            get: jest.fn(),
-          },
-        },
-      ],
+      providers: [CatalogExplorerService],
     }).compile();
 
     service = module.get<CatalogExplorerService>(CatalogExplorerService);
-    httpService = module.get<HttpService>(HttpService);
-
-    setupHttpServiceMock(httpService);
   });
 
   it('should be defined', () => {
@@ -45,25 +35,37 @@ describe('CatalogExplorerService', () => {
       '3023_5': 15,
       '3004_2': 15,
       '3004_155': 7,
-      '3004_5': 15
+      '3004_5': 15,
     });
   });
 
   it('should transform set pieces correctly', () => {
-    const transformed = service['transformSetInventory'](mockFullSet1.pieces);
+    const transformed = service['transformUserInventory'](mockFullSet1.pieces);
     expect(transformed).toEqual({
       '11211_5': 18,
-      '36840_5': 10
+      '36840_5': 10,
     });
   });
 
   describe('getBuildableSets', () => {
     it('should return buildable sets for the user', async () => {
+      (fetch as jest.MockedFunction<typeof fetch>)
+        .mockResolvedValueOnce(new Response(JSON.stringify(mockUser1)))
+        .mockResolvedValueOnce(new Response(JSON.stringify([mockFullSet1, mockFullSet2])))
+        .mockResolvedValueOnce(new Response(JSON.stringify(mockFullSet1)))
+        .mockResolvedValueOnce(new Response(JSON.stringify(mockFullSet2)));
+
       const result = await service.getBuildableSets('brickfan35');
       expect(result).toEqual([mockFullSet1, mockFullSet2]);
     });
 
     it('should return an empty array if no sets can be built', async () => {
+      (fetch as jest.MockedFunction<typeof fetch>)
+        .mockResolvedValueOnce(new Response(JSON.stringify(mockUser2)))
+        .mockResolvedValueOnce(new Response(JSON.stringify([mockFullSet1, mockFullSet2])))
+        .mockResolvedValueOnce(new Response(JSON.stringify(mockFullSet1)))
+        .mockResolvedValueOnce(new Response(JSON.stringify(mockFullSet2)));
+
       const result = await service.getBuildableSets('brickfan22');
       expect(result).toEqual([]);
     });

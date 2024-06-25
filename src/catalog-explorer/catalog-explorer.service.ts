@@ -1,32 +1,29 @@
 import { Injectable } from '@nestjs/common';
-import { HttpService } from '@nestjs/axios';
-import { map } from 'rxjs/operators';
-import { Set, Brick } from './catalog-explorer.dto';
-import { lastValueFrom } from 'rxjs';
+import fetch from 'node-fetch';
+import { Set, FullSet, User } from './catalog-explorer.dto';
 
 @Injectable()
 export class CatalogExplorerService {
   private apiUrl = 'https://d16m5wbro86fg2.cloudfront.net/api';
 
-  constructor(private readonly httpService: HttpService) {}
+  constructor() {}
 
-  async getUserByUsername(username: string) {
-    const response = await lastValueFrom(this.httpService
-      .get(`${this.apiUrl}/user/by-username/${username}`)
-      .pipe(map(response => response.data)));
-    return response;
+  async getUserByUsername(username: string): Promise<User> {
+    const response = await (await fetch(`${this.apiUrl}/user/by-username/${username}`));
+    const data = await response.json();
+    return data as User;
   }
 
-  async getSets() {
-    const response = await lastValueFrom(this.httpService.get(`${this.apiUrl}/sets`).pipe(
-      map(response => response.data)));
-    return response;
+  async getSets() : Promise<Set[]> {
+    const response = await (await fetch(`${this.apiUrl}/sets`));
+    const data = await response.json();
+    return data as Set[];
   }
 
-  async getSetById(id: string) {
-    const response = await lastValueFrom(this.httpService.get(`${this.apiUrl}/set/by-id/${id}`).pipe(
-      map(response => response.data)));
-    return response;
+  async getSetById(id: string) : Promise<FullSet> {
+    const response = await (await fetch(`${this.apiUrl}/set/by-id/${id}`));
+    const data = await response.json();
+    return data as FullSet;
   }
 
   async getBuildableSets(username: string): Promise<Set[]> {
@@ -66,7 +63,7 @@ export class CatalogExplorerService {
     return transformed;
   }
 
-  private canBuildSet(set: Set, userInventory): boolean {
+  private canBuildSet(set: FullSet, userInventory): boolean {
     const setInventory = this.transformSetInventory(set.pieces);
     for (const key in setInventory) {
       if (!userInventory[key] || userInventory[key] < setInventory[key]) {
