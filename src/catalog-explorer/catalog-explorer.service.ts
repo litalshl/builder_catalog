@@ -35,7 +35,7 @@ export class CatalogExplorerService {
       return data as User;
     } catch (error) {
       this.logger.error(`Error fetching user by id: ${id}`, error.stack);
-      throw error;
+      throw new Error(`User details not found for user id: ${id}`);
     }
   }
 
@@ -47,10 +47,13 @@ export class CatalogExplorerService {
         throw new Error('Failed to fetch sets');
       }
       const data = await response.json();
+      if (!data.Sets) {
+        throw new Error('Sets data is missing');
+      }
       return data.Sets as Set[];
     } catch (error) {
       this.logger.error('Error fetching sets', error.stack);
-      throw error;
+      throw new Error('Sets data is not an array');
     }
   }
 
@@ -72,8 +75,22 @@ export class CatalogExplorerService {
   async getBuildableSets(username: string): Promise<Set[]> {
     try {
       const user = await this.getUserByUsername(username);
+      if (!user) {
+        this.logger.error(`User not found: ${username}`);
+        throw new Error(`User not found: ${username}`);
+      }
+
       const userDetails = await this.getUserDetailsById(user.id);
-      const sets: Set[] = await this.getSets();
+      if (!userDetails) {
+        this.logger.error(`User details not found for user id: ${user.id}`);
+        throw new Error(`User details not found for user id: ${user.id}`);
+      }
+
+      const sets = await this.getSets();
+      if (!Array.isArray(sets)) {
+        this.logger.error('Sets data is not an array');
+        throw new Error('Sets data is not an array');
+      }
 
       this.logger.log(`Fetched ${sets.length} sets`);
 
