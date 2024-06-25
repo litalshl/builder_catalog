@@ -40,7 +40,7 @@ describe('CatalogExplorerService', () => {
   });
 
   it('should transform set pieces correctly', () => {
-    const transformed = service['transformUserInventory'](mockFullSet1.pieces);
+    const transformed = service['transformSetInventory'](mockFullSet1.pieces);
     expect(transformed).toEqual({
       '11211_5': 18,
       '36840_5': 10,
