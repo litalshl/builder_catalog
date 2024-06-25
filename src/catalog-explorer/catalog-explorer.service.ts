@@ -1,9 +1,12 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import fetch from 'node-fetch';
 import { Set, FullSet, User } from './catalog-explorer.dto';
 
 @Injectable()
 export class CatalogExplorerService {
+
+  private readonly logger = new Logger(CatalogExplorerService.name);
+
   private apiUrl = 'https://d16m5wbro86fg2.cloudfront.net/api';
 
   constructor() {}
@@ -14,10 +17,16 @@ export class CatalogExplorerService {
     return data as User;
   }
 
+  async getUserDetailsById(id: string): Promise<User> {
+    const response = await (await fetch(`${this.apiUrl}/user/by-id/${id}`));
+    const data = await response.json();
+    return data as User;
+  }
+
   async getSets() : Promise<Set[]> {
     const response = await (await fetch(`${this.apiUrl}/sets`));
     const data = await response.json();
-    return data as Set[];
+    return data.Sets as Set[];
   }
 
   async getSetById(id: string) : Promise<FullSet> {
@@ -28,9 +37,11 @@ export class CatalogExplorerService {
 
   async getBuildableSets(username: string): Promise<Set[]> {
     const user = await this.getUserByUsername(username);
-    const sets = await this.getSets();
+    const userDetails = await this.getUserDetailsById(user.id);
+    const sets : Set[] = await this.getSets();
+    this.logger.log('Sets type: ', typeof sets);
 
-    const userInventory = this.transformUserInventory(user.collection);
+    const userInventory = this.transformUserInventory(userDetails.collection);
 
     const buildableSets = [];
     for (const set of sets) {
