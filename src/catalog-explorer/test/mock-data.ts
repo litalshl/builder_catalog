@@ -170,13 +170,13 @@ export const mockUser1 = {
  export const mockSets = {
     "Sets": [
     {
-        "id": "040f11ab-e301-4724-bacd-50841816e06b",
+        "id": "1",
         "name": "alien-spaceship",
         "setNumber": "497XX",
         "totalPieces": 1050
     },
     {
-        "id": "c33d995e-d4e8-4dd3-8857-07438c29b0de",
+        "id": "2",
         "name": "beach-buggy",
         "setNumber": "134XX",
         "totalPieces": 780

@@ -35,7 +35,7 @@ export class CatalogExplorerService {
       return data as User;
     } catch (error) {
       this.logger.error(`Error fetching user by id: ${id}`, error.stack);
-      throw error;
+      throw new Error(`User details not found for user id: ${id}`);
     }
   }
 
@@ -47,10 +47,13 @@ export class CatalogExplorerService {
         throw new Error('Failed to fetch sets');
       }
       const data = await response.json();
+      if (!data.Sets) {
+        throw new Error('Sets data is missing');
+      }
       return data.Sets as Set[];
     } catch (error) {
       this.logger.error('Error fetching sets', error.stack);
-      throw error;
+      throw new Error('Sets data is not an array');
     }
   }
 
@@ -71,18 +74,14 @@ export class CatalogExplorerService {
 
   async getBuildableSets(username: string): Promise<Set[]> {
     try {
-      const user = await this.getUserByUsername(username);
-      const userDetails = await this.getUserDetailsById(user.id);
-      const sets: Set[] = await this.getSets();
-
-      this.logger.log(`Fetched ${sets.length} sets`);
-
-      const userInventory = this.transformUserInventory(userDetails.collection);
+      const { sets, userDetails } = await this.getDataForBuildableSets(username);   
+      const userInventory = this.defineUserInventory(userDetails.collection);
       const buildableSets = [];
 
       for (const set of sets) {
         const fullSet = await this.getSetById(set.id);
-        if (this.canBuildSet(fullSet, userInventory)) {
+        const setInventory = this.defineSetInventory(fullSet.pieces);
+        if (this.canBuildSet(setInventory, userInventory)) {
           buildableSets.push(fullSet);
         }
       }
@@ -95,7 +94,28 @@ export class CatalogExplorerService {
     }
   }
 
-  protected transformUserInventory(collection): any {
+  private async getDataForBuildableSets(username: string) {
+    const user = await this.getUserByUsername(username);
+    if (!user) {
+      this.logger.error(`User not found: ${username}`);
+      throw new Error(`User not found: ${username}`);
+    }
+
+    const userDetails = await this.getUserDetailsById(user.id);
+    if (!userDetails) {
+      this.logger.error(`User details not found for user id: ${user.id}`);
+      throw new Error(`User details not found for user id: ${user.id}`);
+    }
+
+    const sets = await this.getSets();
+    if (!Array.isArray(sets)) {
+      this.logger.error('Sets data is not an array');
+      throw new Error('Sets data is not an array');
+    }
+    return { sets, userDetails };
+  }
+
+  protected defineUserInventory(collection): any {
     const transformed = {};
     collection.forEach(item => {
       item.variants.forEach(variant => {
@@ -106,7 +126,7 @@ export class CatalogExplorerService {
     return transformed;
   }
 
-  protected transformSetInventory(pieces): any {
+  protected defineSetInventory(pieces): any {
     const transformed = {};
     pieces.forEach(piece => {
       const key = `${piece.part.designID}_${piece.part.material}`;
@@ -115,8 +135,8 @@ export class CatalogExplorerService {
     return transformed;
   }
 
-  private canBuildSet(set: FullSet, userInventory): boolean {
-    const setInventory = this.transformSetInventory(set.pieces);
+  private canBuildSet(setInventory, userInventory): boolean {
+    
     for (const key in setInventory) {
       if (!userInventory[key] || userInventory[key] < setInventory[key]) {
         return false;
