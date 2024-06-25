@@ -1,4 +1,4 @@
-export const mockUser = {
+export const mockUser1 = {
     "id": "1",
     "username": "brickfan35",
     "location": "UKY",
@@ -88,6 +88,98 @@ export const mockUser = {
           }
         ]
   };
+
+  export const mockUser2 = {
+    "id": "1",
+    "username": "brickfan22",
+    "location": "UKY",
+    "brickCount": 1413,
+    "collection": [
+        {
+            "pieceId": "3710",
+            "variants": [
+                {
+                    "color": "155",
+                    "count": 9
+                },
+                {
+                    "color": "152",
+                    "count": 7
+                },
+                {
+                    "color": "2",
+                    "count": 8
+                },
+                {
+                    "color": "7",
+                    "count": 8
+                },
+                {
+                    "color": "9",
+                    "count": 4
+                },
+                {
+                    "color": "5",
+                    "count": 3
+                },
+                {
+                    "color": "1",
+                    "count": 6
+                },
+                {
+                    "color": "34",
+                    "count": 11
+                },
+                {
+                    "color": "3",
+                    "count": 8
+                }
+            ]
+        },
+        {
+            "pieceId": "3005",
+            "variants": [
+                {
+                    "color": "2",
+                    "count": 15
+                },
+                {
+                    "color": "155",
+                    "count": 7
+                },
+                {
+                    "color": "152",
+                    "count": 9
+                },
+                {
+                    "color": "5",
+                    "count": 6
+                },
+                {
+                    "color": "1",
+                    "count": 4
+                },
+                {
+                    "color": "9",
+                    "count": 6
+                },
+                {
+                    "color": "7",
+                    "count": 2
+                },
+                {
+                    "color": "3",
+                    "count": 14
+                },
+                {
+                    "color": "34",
+                    "count": 4
+                }
+            ]
+          }
+        ]
+  };
+
 
  export const mockSets = {
     "Sets": [
