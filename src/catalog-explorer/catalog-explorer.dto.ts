@@ -27,5 +27,5 @@ export class Set {
   name: string;
 
   @Field(() => [Brick])
-  bricks: Brick[];
+  pieces: Brick[];
 }

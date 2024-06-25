@@ -56,8 +56,18 @@ export class CatalogExplorerService {
     return transformed;
   }
 
+  private transformSetInventory(pieces) {
+    const transformed = {};
+    pieces.forEach(piece => {
+      const key = `${piece.part.designID}_${piece.part.material}`;
+      transformed[key] = piece.quantity;
+    });
+
+    return transformed;
+  }
+
   private canBuildSet(set: Set, userInventory): boolean {
-    const setInventory = this.transformUserInventory(set.bricks);
+    const setInventory = this.transformSetInventory(set.pieces);
     for (const key in setInventory) {
       if (!userInventory[key] || userInventory[key] < setInventory[key]) {
         return false;
