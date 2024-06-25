@@ -45,7 +45,7 @@ export class CatalogExplorerService {
     return buildableSets;
   }
 
-  private transformUserInventory(collection) {
+  protected transformUserInventory(collection) {
     const transformed = {};
     collection.forEach(item => {
       item.variants.forEach(variant => {
@@ -56,7 +56,7 @@ export class CatalogExplorerService {
     return transformed;
   }
 
-  private transformSetInventory(pieces) {
+  protected transformSetInventory(pieces) {
     const transformed = {};
     pieces.forEach(piece => {
       const key = `${piece.part.designID}_${piece.part.material}`;

@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { HttpService } from '@nestjs/axios';
 import { CatalogExplorerService } from '../catalog-explorer.service';
-import { mockFullSet1, mockFullSet2 } from './mocks/mock-data'
+import { mockFullSet1, mockFullSet2, mockUser1, mockUser2 } from './mocks/mock-data'
 import { setupHttpServiceMock } from './mocks/mock-http-service';
 
 describe('CatalogExplorerService', () => {
@@ -29,6 +29,32 @@ describe('CatalogExplorerService', () => {
 
   it('should be defined', () => {
     expect(service).toBeDefined();
+  });
+
+  it('should transform user collection correctly', () => {
+    const transformed = service['transformUserInventory'](mockUser1.collection);
+    expect(transformed).toEqual({
+      '11211_155': 9,
+      '11211_9': 4,
+      '11211_5': 20,
+      '36840_2': 15,
+      '36840_155': 7,
+      '36840_5': 15,
+      '3023_2': 15,
+      '3023_4': 11,
+      '3023_5': 15,
+      '3004_2': 15,
+      '3004_155': 7,
+      '3004_5': 15
+    });
+  });
+
+  it('should transform set pieces correctly', () => {
+    const transformed = service['transformSetInventory'](mockFullSet1.pieces);
+    expect(transformed).toEqual({
+      '11211_5': 18,
+      '36840_5': 10
+    });
   });
 
   describe('getBuildableSets', () => {
