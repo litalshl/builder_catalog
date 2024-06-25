@@ -2,18 +2,27 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
-type Brick {
-  id: String!
-  name: String!
-  width: Int!
-  length: Int!
-  colorId: String!
+type Piece {
+  pieceId: String!
+  variants: [Variant!]!
+}
+
+type Variant {
+  color: String!
+  count: Float!
+}
+
+type Part {
+  designID: String!
+  material: Float!
+  partType: String!
 }
 
 type Set {
   id: String!
   name: String!
-  bricks: [Brick!]!
+  setNumber: String!
+  totalPieces: Float!
 }
 
 type Query {
