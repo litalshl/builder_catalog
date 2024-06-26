@@ -2,6 +2,10 @@
 
 This is an example NestJS project using GraphQL for presenting a case study for a builder catalog explore functionality.
 
+## Sequence Diagram
+![image](https://github.com/litalshl/builder_catalog/assets/4789316/ea9ef987-032a-4931-b303-84ebd70606c5)
+
+
 ## Installation
 
 ```bash
