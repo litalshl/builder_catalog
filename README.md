@@ -34,6 +34,12 @@ $ npm run test
 # e2e tests
 $ npm run test:e2e
 
+## Possible Improvements
+Adding Neo4J as database. Possible schema:
+![image](https://github.com/litalshl/builder_catalog/assets/4789316/ca211aaf-f428-4ce9-8694-c7b89b650abc)
+![image](https://github.com/litalshl/builder_catalog/assets/4789316/ca211aaf-f428-4ce9-8694-c7b89b650abc)
+
+
 # test coverage
 $ npm run test:cov
 ```
